@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Regras>
+<RulesSQL>
+  <ID>1</ID>
+  <Description>Teste1</Description>
+  <Pattern>AAA</Pattern>
+</RulesSQL>
+  <RulesSQL>
+    <ID>1</ID>
+    <Description>Teste1</Description>
+    <Pattern>AAA</Pattern>
+  </RulesSQL>
+</Regras>

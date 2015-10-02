@@ -5,9 +5,13 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace MatchPattnerSQL
 {
@@ -68,20 +72,51 @@ namespace MatchPattnerSQL
 
         private void btnGo_Click(object sender, EventArgs e)
         {
+            List<FileInfo> lstFiles = null;
+            //Product deserializedProduct = JsonConvert.DeserializeObject<Product>(json);
+
             try
             {
                 btnGo.Enabled = false;
-                pBar1.Minimum = 1;
-                pBar1.Maximum = 100;
+                textBox2.Text = "";
+                lstFiles = getFiles();
+
+                if (lstFiles == null || lstFiles.Count()==0)
+                    return;
+
+                pBar1.Minimum = 0;
+                pBar1.Maximum =  lstFiles.Count();
                 pBar1.Value = 1;
                 pBar1.Step = 1;
+                
+                //for (int x = 1; x <= 100; x++)
 
-                for (int x = 1; x <= 100; x++)
+                foreach (FileInfo fileinfo in lstFiles)
+                {
+                    textBox2.Text += DateTime.Now.ToString() + @" - " + fileinfo.Name + Environment.NewLine;
                     pBar1.PerformStep();
-                                
+                    //System.Threading.Thread.Sleep(1000);
+                }
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(@"RulesSQL.xml"); 
+                XmlNodeList xnList = xmlDoc.GetElementsByTagName("RulesSQL");
+
+                List<RulesSQL> lstRules = new List<RulesSQL>();
+                foreach (XmlNode xn in xnList)
+                {
+                    lstRules.Add(new RulesSQL() { ID = xn["ID"].InnerText, Description = xn["Description"].InnerText, Pattern = xn["Pattern"].InnerText });
+                }
+
+               // foreach(RulesSQL r in instance)
+                 //  textBox2.Text += "olaa";
+
             }
-            catch { }
-            finally 
+            catch 
+            {
+
+            }
+            finally
             {
                 btnGo.Enabled = true;
             }
@@ -89,7 +124,7 @@ namespace MatchPattnerSQL
 
         private void button2_Click(object sender, EventArgs e)
         {
-            DirectoryInfo diretorio = new DirectoryInfo(txtFolder.Text+@"\");
+            DirectoryInfo diretorio = new DirectoryInfo(txtFolder.Text + @"\");
             FileInfo[] Arquivos = diretorio.GetFiles(textBox1.Text);
             textBox2.Text = "";
             foreach (FileInfo fileinfo in Arquivos)
@@ -97,5 +132,25 @@ namespace MatchPattnerSQL
                 textBox2.Text += fileinfo.Name + Environment.NewLine;
             }
         }
+
+        private List<FileInfo> getFiles()
+        {
+            List<FileInfo> lstFiles = null;
+            try
+            {
+                DirectoryInfo path = new DirectoryInfo(txtFolder.Text);
+                FileInfo[] Files = path.GetFiles(textBox1.Text);
+                //               textBox2.Text = "";
+                if (Files != null && Files.Count() > 0)
+                    lstFiles = Files.ToList();
+            }
+            catch
+            {
+                throw;
+            }
+            return lstFiles;
+        }
+
+        
     }
 }
