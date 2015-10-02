@@ -42,7 +42,7 @@
             this.txtFolder = new System.Windows.Forms.TextBox();
             this.folder = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtLog = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -179,7 +179,7 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.textBox2);
+            this.groupBox3.Controls.Add(this.txtLog);
             this.groupBox3.Location = new System.Drawing.Point(13, 178);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(748, 154);
@@ -187,15 +187,15 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Log...";
             // 
-            // textBox2
+            // txtLog
             // 
-            this.textBox2.Location = new System.Drawing.Point(7, 20);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox2.Size = new System.Drawing.Size(735, 128);
-            this.textBox2.TabIndex = 0;
+            this.txtLog.Location = new System.Drawing.Point(7, 20);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtLog.Size = new System.Drawing.Size(735, 128);
+            this.txtLog.TabIndex = 0;
             // 
             // Form1
             // 
@@ -231,7 +231,7 @@
         private System.Windows.Forms.ProgressBar pBar1;
         private System.Windows.Forms.Button btnGo;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.Button button2;
     }
 }

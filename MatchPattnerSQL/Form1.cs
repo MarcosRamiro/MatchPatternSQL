@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -17,6 +18,12 @@ namespace MatchPattnerSQL
 {
     public partial class Form1 : Form
     {
+
+        public delegate void UpdateBar();
+        public delegate void UpdateLog(string log);
+        public UpdateBar delegateUpdateBar;
+        public UpdateLog delegateUpdateLog;
+
         public Form1()
         {
             InitializeComponent();
@@ -72,41 +79,35 @@ namespace MatchPattnerSQL
 
         private void btnGo_Click(object sender, EventArgs e)
         {
-            List<FileInfo> lstFiles = null;
+           
             //Product deserializedProduct = JsonConvert.DeserializeObject<Product>(json);
-
+            MyThreadClass myThr = new MyThreadClass(this);
+            List<FileInfo> lstFiles = null;
             try
             {
                 btnGo.Enabled = false;
-                textBox2.Text = "";
+                txtLog.Text = "";
+
                 lstFiles = getFiles();
 
-                if (lstFiles == null || lstFiles.Count()==0)
+                if (lstFiles == null || lstFiles.Count() == 0)
                     return;
 
                 pBar1.Minimum = 0;
-                pBar1.Maximum =  lstFiles.Count();
+                pBar1.Maximum = lstFiles.Count();
                 pBar1.Value = 1;
                 pBar1.Step = 1;
-                
+
+                delegateUpdateBar = new UpdateBar(methodUpdateBar);
+                delegateUpdateLog = new UpdateLog(methodUpdatetxtLog);
+
+                Thread myThread = new Thread(() => myThr.myThread(lstFiles));
+                myThread.Start();
+              
+               
                 //for (int x = 1; x <= 100; x++)
 
-                foreach (FileInfo fileinfo in lstFiles)
-                {
-                    textBox2.Text += DateTime.Now.ToString() + @" - " + fileinfo.Name + Environment.NewLine;
-                    pBar1.PerformStep();
-                    //System.Threading.Thread.Sleep(1000);
-                }
-
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(@"RulesSQL.xml"); 
-                XmlNodeList xnList = xmlDoc.GetElementsByTagName("RulesSQL");
-
-                List<RulesSQL> lstRules = new List<RulesSQL>();
-                foreach (XmlNode xn in xnList)
-                {
-                    lstRules.Add(new RulesSQL() { ID = xn["ID"].InnerText, Description = xn["Description"].InnerText, Pattern = xn["Pattern"].InnerText });
-                }
+                
 
                // foreach(RulesSQL r in instance)
                  //  textBox2.Text += "olaa";
@@ -119,17 +120,6 @@ namespace MatchPattnerSQL
             finally
             {
                 btnGo.Enabled = true;
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            DirectoryInfo diretorio = new DirectoryInfo(txtFolder.Text + @"\");
-            FileInfo[] Arquivos = diretorio.GetFiles(textBox1.Text);
-            textBox2.Text = "";
-            foreach (FileInfo fileinfo in Arquivos)
-            {
-                textBox2.Text += fileinfo.Name + Environment.NewLine;
             }
         }
 
@@ -151,6 +141,87 @@ namespace MatchPattnerSQL
             return lstFiles;
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DirectoryInfo diretorio = new DirectoryInfo(txtFolder.Text + @"\");
+            FileInfo[] Arquivos = diretorio.GetFiles(textBox1.Text);
+            txtLog.Text = "";
+            foreach (FileInfo fileinfo in Arquivos)
+            {
+                txtLog.Text += fileinfo.Name + Environment.NewLine;
+            }
+        }
+
+
+
+        private void methodUpdateBar()
+        {
+            try
+            { 
+                pBar1.PerformStep();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        private void methodUpdatetxtLog(string log)
+        {
+            try
+            {
+                txtLog.Text = DateTime.Now.ToString() + @" - " + log + Environment.NewLine + txtLog.Text; 
+            }
+            catch
+            {
+                throw;
+            }
+        }
         
     }
+
+    public class MyThreadClass
+    {
+        Form1 myForm1 = null;
+
+        public MyThreadClass(Form1 Form1)
+        {
+            this.myForm1 = Form1;
+        }
+
+        public void myThread(List<FileInfo> outlstFiles)
+        {
+            List<FileInfo> lstFiles = outlstFiles;
+
+            try
+            {
+
+                foreach (FileInfo fileinfo in lstFiles)
+                {
+                    //textBox2.Text += DateTime.Now.ToString() + @" - " + fileinfo.Name + Environment.NewLine;
+                    // pBar1.PerformStep();
+                    myForm1.Invoke(myForm1.delegateUpdateLog, new Object[] {fileinfo.Name});
+                    myForm1.Invoke(myForm1.delegateUpdateBar);
+
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(@"RulesSQL.xml");
+                XmlNodeList xnList = xmlDoc.GetElementsByTagName("RulesSQL");
+
+                List<RulesSQL> lstRules = new List<RulesSQL>();
+                foreach (XmlNode xn in xnList)
+                {
+                    lstRules.Add(new RulesSQL() { ID = xn["ID"].InnerText, Description = xn["Description"].InnerText, Pattern = xn["Pattern"].InnerText });
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+    }
+
 }
