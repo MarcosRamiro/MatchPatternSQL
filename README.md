@@ -11,5 +11,3 @@ Próximos passos:
 1 - Abrir os arquivos *.sql
 2 - Preparar o arquivos para fazer o match
 3 - Fazer o Match, listar os que deram erro e somar um no contador...
-[...] - (TBD)
-999 - Fazer o processamento em threads para não travar a tela
