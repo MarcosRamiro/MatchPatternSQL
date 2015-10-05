@@ -23,6 +23,7 @@ namespace MatchPattnerSQL
         public delegate void UpdateLog(string log);
         public UpdateBar delegateUpdateBar;
         public UpdateLog delegateUpdateLog;
+        private Thread myThread;
 
         public Form1()
         {
@@ -85,41 +86,36 @@ namespace MatchPattnerSQL
             List<FileInfo> lstFiles = null;
             try
             {
-                btnGo.Enabled = false;
+                if (myThread != null && myThread.IsAlive)
+                    return;
+
+                //btnGo.Enabled = false;
                 txtLog.Text = "";
 
                 lstFiles = getFiles();
 
                 if (lstFiles == null || lstFiles.Count() == 0)
                     return;
+                                                
+                delegateUpdateBar = new UpdateBar(methodUpdateBar);
+                delegateUpdateLog = new UpdateLog(methodUpdatetxtLog);
 
                 pBar1.Minimum = 0;
                 pBar1.Maximum = lstFiles.Count();
                 pBar1.Value = 1;
                 pBar1.Step = 1;
 
-                delegateUpdateBar = new UpdateBar(methodUpdateBar);
-                delegateUpdateLog = new UpdateLog(methodUpdatetxtLog);
-
-                Thread myThread = new Thread(() => myThr.myThread(lstFiles));
+                myThread = new Thread(() => myThr.myThread(lstFiles));
                 myThread.Start();
-              
-               
-                //for (int x = 1; x <= 100; x++)
-
-                
-
-               // foreach(RulesSQL r in instance)
-                 //  textBox2.Text += "olaa";
-
+ 
             }
             catch 
             {
-
+                throw;
             }
             finally
             {
-                btnGo.Enabled = true;
+                //btnGo.Enabled = true;
             }
         }
 
@@ -203,7 +199,7 @@ namespace MatchPattnerSQL
                     myForm1.Invoke(myForm1.delegateUpdateLog, new Object[] {fileinfo.Name});
                     myForm1.Invoke(myForm1.delegateUpdateBar);
 
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(100);
                 }
 
                 XmlDocument xmlDoc = new XmlDocument();
