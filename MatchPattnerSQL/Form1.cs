@@ -102,7 +102,7 @@ namespace MatchPattnerSQL
 
                 pBar1.Minimum = 0;
                 pBar1.Maximum = lstFiles.Count();
-                pBar1.Value = 1;
+                pBar1.Value = 0;
                 pBar1.Step = 1;
 
                 myThread = new Thread(() => myThr.myThread(lstFiles));
